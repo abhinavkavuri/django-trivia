@@ -31,9 +31,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'student.apps.StudentConfig',
-    'instructor.apps.InstructorConfig',
-    'users.apps.UsersConfig',
     'home.apps.HomeConfig',
     'crispy_forms',
     'django.contrib.admin',
@@ -122,6 +119,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
+
 
 STATIC_URL = '/static/'
 

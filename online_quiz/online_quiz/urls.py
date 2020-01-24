@@ -15,30 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from users import views as user_views
-from instructor import views as ins_views
-from student import views as st_views
-
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('register/', user_views.register, name="register"),
     path('', include('home.urls')),
-
-    path('login/', user_views.login_view, name="login"),
-    path('logout/', user_views.logout, name="logout"),
-    path('profile/', user_views.profile, name="profile"),
-
-    path('instructor/', ins_views.instructor, name="instructor"),
-    path('instructor/create_quiz/', ins_views.create_quiz, name="create_quiz"),
-    path('instructor/display_questions/', ins_views.display_questions, name="display_questions"),
-    path('instructor/view_scores/', ins_views.view_scores, name="view_scores"),
-
-    path('student/', st_views.student, name="student"),
-    path('student/start_quiz/', st_views.start_quiz, name="start_quiz"),
-    path('student/user_scores/', st_views.user_scores, name="user_scores"),
 
 ]
 

@@ -48,8 +48,6 @@
                   <li><a href="{% url 'Home-home' %}" style="text-decoration:none">Home</a></li>
               {% endif %}
 
-
-
               <li><a href="{% url 'Home-about' %}" style="text-decoration:none">About</a></li>
               {% if request.session.user %}
                 <li><a href="{% url 'logout' %}" style="text-decoration:none">Logout</a></li>
