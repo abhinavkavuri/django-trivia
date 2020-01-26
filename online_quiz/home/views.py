@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from django.contrib.auth.models import User
 from .forms import UserRegisterForm
-from .models import User, Questions, Scores
+from .models import Questions, Scores, ExtendedUser
 
 '''
 Home -> templates -> home -> ( base.html | home.html | about.html )
@@ -44,18 +46,22 @@ def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
+            form.save()
             email = form.cleaned_data.get('email')
             usertype = form.cleaned_data.get('usertype')
             password1 = form.cleaned_data.get('password1')
             password2 = form.cleaned_data.get('password2')
 
             if password1 == password2:
-                user = User(user_name=username, user_password=password1, user_type=usertype, user_email=email,
-                            user_points=30)
-                user.save()
+                user = User.objects.get(email=email)
+                if usertype == "student":
+                    ext = ExtendedUser(user=user, user_type=usertype, user_points=30)
+                    ext.save()
+                else:
+                    ext = ExtendedUser(user=user, user_type=usertype)
+                    ext.save()
                 print("New User Registered.")
-                messages.success(request, f'Account created for {username}!')
+                messages.success(request, f'Account created for {email}!')
                 return redirect('login')
 
     else:
@@ -68,12 +74,14 @@ def login_view(request):
 
         user_name = request.POST['uname']
         password = request.POST['pass']
-        retr = User.objects.filter(user_name=user_name, user_password=password)
+        retr = authenticate(username=user_name, password=password)
+
         if retr:
             print("user found !!")
-            email = User.objects.only('user_email').get(user_name=user_name, user_password=password).user_email
-            points = User.objects.only('user_points').get(user_name=user_name, user_password=password).user_points
-            utype = User.objects.only('user_type').get(user_name=user_name, user_password=password).user_type
+            user = User.objects.get(username=user_name)
+            email = User.objects.only('email').get(username=user_name).email
+            points = ExtendedUser.objects.only('user_points').get(user=user).user_points
+            utype = ExtendedUser.objects.only('user_type').get(user=user).user_type
             print(utype)
             request.session['user'] = user_name
             request.session['email'] = email
@@ -156,10 +164,11 @@ def create_quiz(request):
                 ques = request.POST['ques']
                 qtype = request.POST['qtype']
                 qtype = int(qtype)
+                user = User.objects.get(email=request.session['email'])
                 if qtype == 1:
                     print("tf called")
                     tf_ans = request.POST['tf_ans']
-                    auth = Questions(quiz_id=request.session['user'], question=ques, question_type=1, ans=tf_ans,
+                    auth = Questions(author=user, question=ques, question_type=1, ans=tf_ans,
                                      weightage=10)
                     auth.save()
                     print("TRUE/FALSE Question submitted successfully !!")
@@ -168,14 +177,16 @@ def create_quiz(request):
                     op2 = request.POST['opt2']
                     op3 = request.POST['opt3']
                     op4 = request.POST['opt4']
-                    ans = request.POST['ans']
-                    auth = Questions(quiz_id=request.session['user'], question=ques, question_type=2, op1=op1, op2=op2,
+                    cl = {1: op1, 2: op2, 3: op3, 4: op4}
+                    ans = cl[int(request.POST['ans'])]
+                    auth = Questions(author=user, question=ques, question_type=2, op1=op1,
+                                     op2=op2,
                                      op3=op3,
                                      op4=op4, ans=ans, weightage=20)
                     auth.save()
                     print("MCQ Question submitted successfully !!")
                 elif qtype == 3:
-                    auth = Questions(quiz_id=request.session['user'], question=ques, question_type=3, weightage=30)
+                    auth = Questions(author=user, question=ques, question_type=3, weightage=30)
                     auth.save()
                     print("ESSAY Question submitted successfully !!")
 
@@ -200,9 +211,9 @@ def display_questions(request):
             if request.method == 'POST':
                 print("Deletion requested !!")
                 selection = request.POST.getlist('sel')
-                user = request.session['user']
+                user = User.objects.get(email=request.session['email'])
                 for l in selection:
-                    Questions.objects.filter(quiz_id=user, question=l).delete()
+                    Questions.objects.filter(author=user, question=l).delete()
                 print("Deletion Complete :)")
                 que_cat1 = Questions.objects.all()
             else:
@@ -268,6 +279,7 @@ def start_quiz(request):
             for i, question in enumerate(ref):
                 get = Questions.objects.filter(question=question)
                 qtype = get[0].question_type
+                print(qtype)
                 actual_ans = get[0].ans
                 user_ans = l[i]
                 if qtype == 1 and user_ans == actual_ans:
@@ -278,10 +290,11 @@ def start_quiz(request):
                     if len(user_ans) > 50:
                         score += 30
 
+            user = User.objects.get(email=request.session['email'])
             auth = Scores(user_name=request.session['user'], score=score)
             auth.save()
-            current = User.objects.only('user_points').get(user_name=request.session['user']).user_points + score
-            u = User.objects.filter(user_name=request.session['user']).update(user_points=current)
+            current = ExtendedUser.objects.only('user_points').get(user=user).user_points + score
+            u = ExtendedUser.objects.filter(user=user).update(user_points=current)
             messages.success(request, f'Trivia Complete ! Click view scores to see results')
             return render(request, "home/student.html")
 

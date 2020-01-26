@@ -4,7 +4,7 @@
     {% csrf_token 	%}
 
     {% for question in Questions %}
-        {% if question.question_type == 1 %}
+        {% if question.question_type == "1" %}
                 <article class="media content-section">
                 <div class="content">
                   <div class="article-metadata">
@@ -15,7 +15,7 @@
                     <input type="radio" name="{{ forloop.counter }}" value="false" style="width:20px;height:20px;" required="required">&nbsp;&nbsp; False <br>
                 </div>
                 </article>
-        {% elif question.question_type == 2 %}
+        {% elif question.question_type == "2" %}
                 <article class="media content-section">
                 <div class="content">
                   <div class="article-metadata">

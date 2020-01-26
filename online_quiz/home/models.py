@@ -1,15 +1,14 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
-class User(models.Model):
-    user_name = models.CharField(max_length=20)
-    user_password = models.CharField(max_length=25)
+class ExtendedUser(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_type = models.CharField(max_length=20)
-    user_email = models.EmailField(max_length=70)
-    user_points = models.IntegerField()
+    user_points = models.IntegerField(null=True)
 
     def __str__(self):
-        return self.user_name
+        return self.user_type
 
 
 class Profile(models.Model):
@@ -28,15 +27,15 @@ Type 2 - Essay type
 
 
 class Questions(models.Model):
-    quiz_id = models.CharField(max_length=40, null=True)
-    question = models.TextField(null=True)
-    question_type = models.IntegerField(null=True)
-    op1 = models.CharField(max_length=40, null=True)
-    op2 = models.CharField(max_length=40, null=True)
-    op3 = models.CharField(max_length=40, null=True)
-    op4 = models.CharField(max_length=40, null=True)
-    ans = models.CharField(max_length=40, null=True)
-    weightage = models.IntegerField(null=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, default='DEFAULT AUTHOR', )
+    question = models.TextField()
+    question_type = models.CharField(max_length=20)
+    op1 = models.CharField(max_length=100, null=True, blank=True)
+    op2 = models.CharField(max_length=100, null=True, blank=True)  # --> Front-end check in-place
+    op3 = models.CharField(max_length=100, null=True, blank=True)
+    op4 = models.CharField(max_length=100, null=True, blank=True)  # --> Essay type Questions have no Answers and Options
+    ans = models.CharField(max_length=100, null=True, blank=True)
+    weightage = models.IntegerField()
 
     def __str__(self):
         return self.question
