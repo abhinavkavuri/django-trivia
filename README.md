@@ -2,7 +2,7 @@
 <a href="https://travis-ci.org/abhinavkavuri/django-trivia"><img alt="Travis (.org)" src="https://img.shields.io/travis/abhinavkavuri/django-trivia.svg?color=blue&logo=github&logoColor=yellow"> </a> [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](https://#) <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/abhinavkavuri/django-trivia.svg"> <img alt="GitHub repo size in bytes" src="https://img.shields.io/github/repo-size/abhinavkavuri/django-trivia.svg?color=red&style=flat-square"> <img alt="GitHub" src="https://img.shields.io/github/license/abhinavkavuri/django-trivia.svg?color=magenta&logo=mozilla&style=flat-square">
 
 Django Trivia application 🧠🎯🔮
-created using Django . HTML . CSS . js(react) 
+created using Django . HTML . CSS . Python
 
 Screens: <br>
 `Landing page`<br>
